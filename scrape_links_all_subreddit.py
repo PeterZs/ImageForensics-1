@@ -3,6 +3,7 @@
 
 import urllib2
 import praw, urllib, re, os, pickle, time, random #Reddit API for Python
+from praw.helpers import submissions_between
 
 NUM_IMGS_PER_COMMENT = 10**6 #basically as many as possible
 NUM_LINKS_TO_GET = 50000
@@ -13,7 +14,8 @@ LINK_FILE_TEST = "links-topyear-all-test.txt" #file to write (test) links to
 def scrape():
   reddit_obj = praw.Reddit(user_agent = "Fake Images Scraper")
   psbattle = reddit_obj.get_subreddit("photoshopbattles") #subreddit of interest
-  submissions = psbattle.get_top_from_year(limit=None)#, params={"after" : "t3_4cd8qr"}) 
+  #submissions = psbattle.get_top_from_year(limit=None)#, params={"after" : "t3_4cd8qr"})
+  submissions = submissions_between(reddit_obj, psbattle) #leave lowest_timestamp and highest_timestamp blank to get all submissions
 
   img_count = 0 
   count_submissions = 1 
