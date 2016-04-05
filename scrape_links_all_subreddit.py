@@ -4,18 +4,10 @@
 import urllib2
 import praw, urllib, re, os, pickle, time, random #Reddit API for Python
 
-#TODO: get submissions more than one at a time
-#TODO: profile code. figure out why url request is so slow?
-
 NUM_IMGS_PER_COMMENT = 10**6 #basically as many as possible
 NUM_LINKS_TO_GET = 50000
 LINK_FILE_TRAIN = "links-topyear-all-train.txt" #file to write (train) links to
 LINK_FILE_TEST = "links-topyear-all-test.txt" #file to write (test) links to
-
-#Make HEAD requests without transferring entire file
-class HeadRequest(urllib2.Request):
-    def get_method(self):
-        return 'HEAD'
 
 #Main scraper
 def scrape():
@@ -66,6 +58,8 @@ def scrape():
 
           #this link is valid so download image at this link
           for link in links:
+            if "](" in link: #correct mistake made by regex: sometimes get http://imgur.com...](http://imgur.com...)
+              link = link[:link.index("]")] #get only up to and not including the ]
             link = link.replace(")","") #because sometimes Imgur links have trailing )
             link_file.write(link + " ")
             link_file.write(submission.id + " ")
