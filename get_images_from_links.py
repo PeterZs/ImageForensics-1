@@ -6,6 +6,14 @@ import multiprocessing
 from threading import Thread
 from uuid import uuid4
 from PIL import Image
+import time
+
+#Timeout
+import signal
+
+def signal_handler(signum, frame):
+    raise Exception("Timed out!")
+
 
 #Input: name of file of links to get images from
 # name of directory to save images to
@@ -33,7 +41,7 @@ def get_images_from_links(links_file_name, img_dir_name):
   #remove any files that are not images
   print "saved images"
 
-  files = os.listdir(img_dir_name)
+  files = list(os.listdir(img_dir_name))
   Parallel(n_jobs=num_cores)(delayed(remove_if_not_image)(img_dir_name, img_file) for img_file in files)
   '''
   for img_file in os.listdir(img_dir_name):
@@ -64,6 +72,7 @@ class HeadRequest(urllib2.Request):
 #Action: save image to that link if valid image at that link
 def save_image_from_link(link, image_dir_name):
   valid_image = True#, maintype = check_image_link_validity(link)
+  print "processing link ", link
 
   if link.endswith(".gifv"): #sometimes these throw us off
     link = link[:-1] #remove trailing v
@@ -89,10 +98,22 @@ def save_image_from_link(link, image_dir_name):
         print "Link for html \"image\": ", link
         #print "maintype: ", maintype
         #give them any name (uuid)
-      urllib.urlretrieve(link, image_dir_name + "/" + str(uuid4()) + "." + extension)
+      print "Retrieving link: ", link
+
+      #time out after a given amount of time
+      signal.signal(signal.SIGALRM, signal_handler)
+      signal.alarm(100)   # 100 seconds limit
+      try:
+          urllib.urlretrieve(link, image_dir_name + "/" + str(uuid4()) + "." + extension)
+      except Exception, msg:
+          print "Timed out!"
+      #urllib.urlretrieve(link, image_dir_name + "/" + str(uuid4()) + "." + extension)
+      #time.sleep(0.5)
+      print "Got link"
     except Exception as e:
       print "Exception ", e
       print "caused by link ", link
+  print "Returning result ", valid_image
   return valid_image
 
 #Input: link
