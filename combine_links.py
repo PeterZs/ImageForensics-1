@@ -20,7 +20,6 @@ def combine_links(links_file_name, links_to_add_file_name):
   print("before reading in new links: %d links total" % len(links))
 
   #add links from our file
-  links_to_add_file_name
   links = read_in_links(links, links_to_add_file_name)
 
   print("after reading in new links: %d links total" % len(links))
@@ -49,30 +48,45 @@ def check_dataset_integrity(train_file_name, test_file_name):
     #hopefully this won't happen but if it does we need to 
     #discard duplicate links from at least one dataset
     print("%d links in both datasets" % len(intersection))
-
+    #train_links_no_duplicates = train_links - intersection
+    #pickle.dump(train_links_no_duplicates, open("train_second_batch_no_duplicates","w"))
     #Remove duplicate links from test data
-    print("Removing duplicates from test data...")
-    test_links_no_duplicates = test_links - intersection
-    pickle.dump(test_links_no_duplicates, open(test_file_name, "w"))
-    print("Pruned test data links saved")
-    print("New dataset sizes: ")
-    print("Train data: " % len(train_links))
-    print("Test data: " % len(test_links_no_duplicates))
+    #print("Removing duplicates from test data...")
+    #test_links_no_duplicates = test_links - intersection
+    #pickle.dump(test_links_no_duplicates, open(test_file_name, "w"))
+    #print("Pruned test data links saved")
+    #print("New dataset sizes: ")
+    #print("Train data: %d" % len(train_links))
+    #print("Test data: %d" % len(test_links_no_duplicates))
     return False 
   else:
     return True
 
-
+#Get all links that aren't in a set of old links we already got images from
+def get_new_links(all_links_set_fname, old_links_set_fname, new_links_set_fname):
+	all_links = pickle.load(open(all_links_set_fname, "r"))
+	old_links = pickle.load(open(old_links_set_fname, "r"))
+	new_links = all_links - old_links
+	print("%d new links" % len(new_links))
+	pickle.dump(new_links, open(new_links_set_fname, "w"))
+	
 if __name__ == "__main__":
   #which mode to run program in
-  read_data = True
-  check_data = False
+  read_data = False
+  check_data = True
+  separate_links = False
 
   if read_data: #we want to read data
-    links_file_name = "small_example_links" #"train_links"
-    links_to_add_file_name = "links-small-example.txt" #"links-topyear-all-train.txt"
+    links_file_name = "train_links" #"train_links"
+    links_to_add_file_name = "train_second_batch_no_duplicates" #"links-topyear-all-train3.txt"
     combine_links(links_file_name, links_to_add_file_name)
   if check_data: #we want to check integrity of our datasets
-    train_links_file_name = "train_links"
-    test_links_file_name = "test_links"
+    train_links_file_name = "all_train_links_413"
+    test_links_file_name = "all_test_links_413"
     print check_dataset_integrity(train_links_file_name, test_links_file_name)
+  if separate_links:
+    all_links_set_fname = "test_links"
+    old_links_set_fname = "test_links_first_batch"
+    new_links_set_fname = "test_links_second_batch"
+    get_new_links(all_links_set_fname, old_links_set_fname, new_links_set_fname)
+

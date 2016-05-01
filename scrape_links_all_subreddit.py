@@ -7,15 +7,15 @@ from praw.helpers import submissions_between
 
 NUM_IMGS_PER_COMMENT = 10**6 #basically as many as possible
 NUM_LINKS_TO_GET = 50000
-LINK_FILE_TRAIN = "links-topyear-all-train.txt" #file to write (train) links to
-LINK_FILE_TEST = "links-topyear-all-test.txt" #file to write (test) links to
+LINK_FILE_TRAIN = "links-topyear-all-train3.txt" #file to write (train) links to
+LINK_FILE_TEST = "links-topyear-all-test3.txt" #file to write (test) links to
 
 #Main scraper
 def scrape():
   reddit_obj = praw.Reddit(user_agent = "Fake Images Scraper")
   psbattle = reddit_obj.get_subreddit("photoshopbattles") #subreddit of interest
   #submissions = psbattle.get_top_from_year(limit=None)#, params={"after" : "t3_4cd8qr"})
-  submissions = submissions_between(reddit_obj, psbattle) #leave lowest_timestamp and highest_timestamp blank to get all submissions
+  submissions = submissions_between(reddit_obj, psbattle, highest_timestamp = 1416475603.0) #leave lowest_timestamp and highest_timestamp blank to get all submissions
 
   img_count = 0 
   count_submissions = 1 
@@ -35,6 +35,7 @@ def scrape():
           print "Not a submission"
         else:
           print "submission id: ", submission.id
+          print "submission timestamp: ", submission.created_utc
           #decide if images from this submission will be for training or test
           link_file = None
           testing = False #are we adding images to testing or training

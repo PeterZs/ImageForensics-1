@@ -21,7 +21,7 @@ def get_images_from_links(links_file_name, img_dir_name):
   #read in set of links as list (for parallelizing)
   links = list(pickle.load(open(links_file_name, "r")))
   #print "last link: ", links[-1]
-  links = links[:50]
+  #links = links[:50]
   num_cores = multiprocessing.cpu_count()
   print "number of cores: ", num_cores
 
@@ -106,7 +106,7 @@ def save_image_from_link(link, image_dir_name):
       try:
           urllib.urlretrieve(link, image_dir_name + "/" + str(uuid4()) + "." + extension)
       except Exception, msg:
-          print "Timed out!"
+          print "Exception (timeout?)"
       #urllib.urlretrieve(link, image_dir_name + "/" + str(uuid4()) + "." + extension)
       #time.sleep(0.5)
       print "Got link"
@@ -137,6 +137,6 @@ def check_image_link_validity(link):
   return valid_image, maintype
 
 if __name__ == "__main__":
-  links_file_name = "small_example_links" #"test_links"
-  img_directory = "example_images_small"# "test-images"
+  links_file_name = "train2_links2" #"test_links_second_batch"
+  img_directory = "train_links_2ndbatch_2ndtry" #"test_images_second_batch"
   get_images_from_links(links_file_name, img_directory)
